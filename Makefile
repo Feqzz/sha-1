@@ -8,4 +8,4 @@ build:
 	$(CC) $(PROG).cpp -o $(NAME)
 
 run:
-	./$(NAME)
+	./$(NAME) abc

@@ -119,9 +119,27 @@ std::string fun(std::bitset<32> &a, std::bitset<32> &b, std::bitset<32> &c,
 	return stream.str();
 }
 
-int main()
+void printUsage()
 {
-	std::string input = "abc";
+	std::cout << "Usage: ./sha-1 <plaintext>" << std::endl;
+}
+
+int main(int args, char *argv[])
+{
+	if (args < 2)
+	{
+		printUsage();
+		return 0;
+	}
+
+	std::string input = argv[1];
+
+	if (input == "--help" || input == "-h")
+	{
+		printUsage();
+		return 0;
+	}
+
 	const int inputBitLength = input.length() * 8;
 	const int numberOfBlocks = ceil(inputBitLength / 448.0);
 	const int paddingAmount = ((numberOfBlocks * 512) - 64) - inputBitLength;
@@ -147,7 +165,7 @@ int main()
 	for (int i = 0; i < numberOfBlocks; i++)
 	{
 		compress(blocksVector[i]);
-		hashedText += fun(a, b, c, d, e, blocksVector[i]);
+		hashedText = fun(a, b, c, d, e, blocksVector[i]);
 	}
 
 	std::cout << "plaintext: " << input << std::endl;
