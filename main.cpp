@@ -75,29 +75,29 @@ std::string fun(std::bitset<32> &a, std::bitset<32> &b, std::bitset<32> &c,
 	for (int i = 0; i < 80; i++)
 	{
 		std::bitset<32> function;
-		std::bitset<32> k;
+		std::bitset<32> rcon;
 		if (i < 20)
 		{
 			function = (b & c) | ((~b) & d);
-			k = 0x5A827999;
+			rcon = 0x5A827999;
 		}
 		else if (i < 40)
 		{
 			function = b ^ c ^ d;
-			k = 0x6ED9EBA1;
+			rcon = 0x6ED9EBA1;
 		}
 		else if (i < 60)
 		{
 			function = (b & c) | (b & d) | (c & d);
-			k = 0x8F1BBCDC;
+			rcon = 0x8F1BBCDC;
 		}
 		else if (i < 80)
 		{
 			function = b ^ c ^ d;
-			k = 0xCA62C1D6;
+			rcon = 0xCA62C1D6;
 		}
 
-		std::bitset<32> temp = plus(rotl(a, 5), plus(function, plus(e, plus(w.at(i), k))));
+		std::bitset<32> temp = plus(rotl(a, 5), plus(function, plus(e, plus(w.at(i), rcon))));
 
 		e = d;
 		d = c;
@@ -111,8 +111,6 @@ std::string fun(std::bitset<32> &a, std::bitset<32> &b, std::bitset<32> &c,
 	c = plus(originalC, c);
 	d = plus(originalD, d);
 	e = plus(originalE, e);
-
-	std::cout << std::hex << a.to_ulong() << std::endl;
 
 	std::stringstream stream;
 	stream << std::hex << a.to_ulong() << b.to_ulong() << c.to_ulong() << d.to_ulong() << e.to_ulong();
@@ -132,7 +130,7 @@ int main(int args, char *argv[])
 		return 0;
 	}
 
-	std::string input = argv[1];
+	const std::string input = argv[1];
 
 	if (input == "--help" || input == "-h")
 	{
@@ -144,11 +142,10 @@ int main(int args, char *argv[])
 	const int numberOfBlocks = ceil(inputBitLength / 448.0);
 	const int paddingAmount = ((numberOfBlocks * 512) - 64) - inputBitLength;
 
-	std::string binaryPlainText = addPadding(input, numberOfBlocks);
+	const std::string binaryPlainText = addPadding(input, numberOfBlocks);
 	
 	std::vector<std::vector<std::bitset<32>>> blocksVector;
 	constructBlocks(blocksVector, binaryPlainText, numberOfBlocks);
-	std::string hashedText;
 
 	std::bitset<32> h0 = 0x67452301;
 	std::bitset<32> h1 = 0xEFCDAB89;
@@ -162,6 +159,7 @@ int main(int args, char *argv[])
 	std::bitset<32> d = h3;
 	std::bitset<32> e = h4;
 
+	std::string hashedText;
 	for (int i = 0; i < numberOfBlocks; i++)
 	{
 		compress(blocksVector[i]);
